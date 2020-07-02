@@ -1,0 +1,928 @@
+{
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "definitions": {
+        "HasuraMetadata": {
+            "title": "HasuraMetadata",
+            "type": "object",
+            "properties": {
+                "version": {
+                    "type": "integer",
+                    "title": "version"
+                },
+                "tables": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/TableElement"
+                    },
+                    "title": "tables"
+                },
+                "actions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Action"
+                    },
+                    "title": "actions"
+                },
+                "custom_types": {
+                    "$ref": "#/definitions/CustomTypes",
+                    "title": "custom_types"
+                },
+                "functions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/FunctionType"
+                    },
+                    "title": "functions"
+                },
+                "remote_schemas": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/RemoteSchema"
+                    },
+                    "title": "remote_schemas"
+                },
+                "query_collections": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/QueryCollection"
+                    },
+                    "title": "query_collections"
+                },
+                "allowlist": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/AllowList"
+                    },
+                    "title": "allowlist"
+                }
+            },
+            "required": [
+                "tables",
+                "version"
+            ]
+        },
+        "FunctionType": {
+            "description": "FUNCTIONS",
+            "title": "FunctionType",
+            "type": "object",
+            "properties": {
+                "function": {
+                    "$ref": "#/definitions/Table",
+                    "title": "function"
+                }
+            },
+            "required": [
+                "function"
+            ]
+        },
+        "RemoteSchema": {
+            "description": "REMOTE SCHEMAS",
+            "title": "RemoteSchema",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "definition": {
+                    "anyOf": [
+                        {
+                            "type": "object",
+                            "properties": {
+                                "url": {
+                                    "type": "string",
+                                    "title": "url"
+                                }
+                            },
+                            "required": [
+                                "url"
+                            ]
+                        },
+                        {
+                            "type": "object",
+                            "properties": {
+                                "url_from_env": {
+                                    "type": "string",
+                                    "title": "url_from_env"
+                                }
+                            },
+                            "required": [
+                                "url_from_env"
+                            ]
+                        }
+                    ],
+                    "title": "definition"
+                }
+            },
+            "required": [
+                "definition",
+                "name"
+            ]
+        },
+        "Action": {
+            "description": "ACTIONS",
+            "title": "Action",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "definition": {
+                    "$ref": "#/definitions/ActionDefinition",
+                    "title": "definition"
+                },
+                "permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/PermissionElement"
+                    },
+                    "title": "permissions"
+                }
+            },
+            "required": [
+                "definition",
+                "name"
+            ]
+        },
+        "ActionDefinition": {
+            "title": "ActionDefinition",
+            "type": "object",
+            "properties": {
+                "handler": {
+                    "type": "string",
+                    "title": "handler"
+                },
+                "output_type": {
+                    "type": "string",
+                    "title": "output_type"
+                },
+                "arguments": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ActionArgument"
+                    },
+                    "title": "arguments"
+                },
+                "type": {
+                    "type": "string",
+                    "title": "type"
+                },
+                "kind": {
+                    "type": "string",
+                    "title": "kind"
+                }
+            },
+            "required": [
+                "handler"
+            ]
+        },
+        "ActionArgument": {
+            "title": "ActionArgument",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "type": {
+                    "type": "string",
+                    "title": "type"
+                }
+            },
+            "required": [
+                "name",
+                "type"
+            ]
+        },
+        "PermissionElement": {
+            "title": "PermissionElement",
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "title": "role"
+                }
+            },
+            "required": [
+                "role"
+            ]
+        },
+        "CustomTypes": {
+            "title": "CustomTypes",
+            "type": "object",
+            "properties": {
+                "objects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ActionObject"
+                    },
+                    "title": "objects"
+                },
+                "input_objects": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ActionObject"
+                    },
+                    "title": "input_objects"
+                },
+                "scalars": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Scalar"
+                    },
+                    "title": "scalars"
+                }
+            }
+        },
+        "Scalar": {
+            "title": "Scalar",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "name"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "ActionObject": {
+            "title": "ActionObject",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "fields": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ActionArgument"
+                    },
+                    "title": "fields"
+                },
+                "relationships": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ActionObjectRelationship"
+                    },
+                    "title": "relationships"
+                }
+            },
+            "required": [
+                "name"
+            ]
+        },
+        "ActionObjectRelationship": {
+            "title": "ActionObjectRelationship",
+            "type": "object",
+            "properties": {
+                "remote_table": {
+                    "$ref": "#/definitions/Table",
+                    "title": "remote_table"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "type": {
+                    "type": "string",
+                    "title": "type"
+                },
+                "field_mapping": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "title": "field_mapping"
+                }
+            },
+            "required": [
+                "field_mapping",
+                "name",
+                "remote_table",
+                "type"
+            ]
+        },
+        "TableElement": {
+            "description": "TABLES",
+            "title": "TableElement",
+            "type": "object",
+            "properties": {
+                "table": {
+                    "$ref": "#/definitions/Table",
+                    "title": "table"
+                },
+                "is_enum": {
+                    "type": "boolean",
+                    "title": "is_enum"
+                },
+                "event_triggers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/EventTrigger"
+                    },
+                    "title": "event_triggers"
+                },
+                "object_relationships": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ObjectRelationship"
+                    },
+                    "title": "object_relationships"
+                },
+                "array_relationships": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/ArrayRelationship"
+                    },
+                    "title": "array_relationships"
+                },
+                "insert_permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/InsertPermission"
+                    },
+                    "title": "insert_permissions"
+                },
+                "select_permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/SelectPermission"
+                    },
+                    "title": "select_permissions"
+                },
+                "delete_permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/DeletePermission"
+                    },
+                    "title": "delete_permissions"
+                },
+                "update_permissions": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/UpdatePermission"
+                    },
+                    "title": "update_permissions"
+                }
+            },
+            "required": [
+                "table"
+            ]
+        },
+        "ArrayRelationship": {
+            "description": "RELATIONSHIPS",
+            "title": "ArrayRelationship",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "using": {
+                    "$ref": "#/definitions/ArrayRelationshipUsing",
+                    "title": "using"
+                }
+            },
+            "required": [
+                "name",
+                "using"
+            ]
+        },
+        "ArrayRelationshipUsing": {
+            "title": "ArrayRelationshipUsing",
+            "type": "object",
+            "properties": {
+                "manual_configuration": {
+                    "$ref": "#/definitions/ManualConfiguration",
+                    "title": "manual_configuration"
+                },
+                "foreign_key_constraint_on": {
+                    "$ref": "#/definitions/ForeignKeyConstraintOn",
+                    "title": "foreign_key_constraint_on"
+                }
+            }
+        },
+        "ObjectRelationship": {
+            "title": "ObjectRelationship",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "using": {
+                    "$ref": "#/definitions/ObjectRelationshipUsing",
+                    "title": "using"
+                }
+            },
+            "required": [
+                "name",
+                "using"
+            ]
+        },
+        "ObjectRelationshipUsing": {
+            "title": "ObjectRelationshipUsing",
+            "type": "object",
+            "properties": {
+                "manual_configuration": {
+                    "$ref": "#/definitions/ManualConfiguration",
+                    "title": "manual_configuration"
+                },
+                "foreign_key_constraint_on": {
+                    "type": "string",
+                    "title": "foreign_key_constraint_on"
+                }
+            }
+        },
+        "ForeignKeyConstraintOn": {
+            "title": "ForeignKeyConstraintOn",
+            "type": "object",
+            "properties": {
+                "column": {
+                    "type": "string",
+                    "title": "column"
+                },
+                "table": {
+                    "$ref": "#/definitions/Table",
+                    "title": "table"
+                }
+            },
+            "required": [
+                "column",
+                "table"
+            ]
+        },
+        "ManualConfiguration": {
+            "title": "ManualConfiguration",
+            "type": "object",
+            "properties": {
+                "remote_table": {
+                    "$ref": "#/definitions/Table",
+                    "title": "remote_table"
+                },
+                "column_mapping": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "type": "string"
+                    },
+                    "title": "column_mapping"
+                }
+            },
+            "required": [
+                "column_mapping",
+                "remote_table"
+            ]
+        },
+        "Table": {
+            "title": "Table",
+            "type": "object",
+            "properties": {
+                "schema": {
+                    "type": "string",
+                    "title": "schema"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                }
+            },
+            "required": [
+                "name",
+                "schema"
+            ]
+        },
+        "DeletePermission": {
+            "description": "PERMISSIONS",
+            "title": "DeletePermission",
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "title": "role"
+                },
+                "permission": {
+                    "$ref": "#/definitions/DeletePermissionOptions",
+                    "title": "permission"
+                }
+            },
+            "required": [
+                "permission",
+                "role"
+            ]
+        },
+        "DeletePermissionOptions": {
+            "title": "DeletePermissionOptions",
+            "type": "object",
+            "properties": {
+                "filter": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": true
+                            },
+                            {
+                                "type": [
+                                    "string",
+                                    "number"
+                                ]
+                            }
+                        ]
+                    },
+                    "title": "filter"
+                }
+            }
+        },
+        "InsertPermission": {
+            "title": "InsertPermission",
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "title": "role"
+                },
+                "permission": {
+                    "$ref": "#/definitions/InsertPermissionOptions",
+                    "title": "permission"
+                }
+            },
+            "required": [
+                "permission",
+                "role"
+            ]
+        },
+        "InsertPermissionOptions": {
+            "title": "InsertPermissionOptions",
+            "type": "object",
+            "properties": {
+                "check": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": true
+                            },
+                            {
+                                "type": [
+                                    "string",
+                                    "number"
+                                ]
+                            }
+                        ]
+                    },
+                    "title": "check"
+                },
+                "columns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "columns"
+                },
+                "backend_only": {
+                    "type": "boolean",
+                    "title": "backend_only"
+                },
+                "set": {
+                    "type": "object",
+                    "additionalProperties": {},
+                    "title": "set"
+                }
+            },
+            "required": [
+                "columns"
+            ]
+        },
+        "SelectPermission": {
+            "title": "SelectPermission",
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "title": "role"
+                },
+                "permission": {
+                    "$ref": "#/definitions/SelectPermissionOptions",
+                    "title": "permission"
+                }
+            },
+            "required": [
+                "permission",
+                "role"
+            ]
+        },
+        "SelectPermissionOptions": {
+            "title": "SelectPermissionOptions",
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "columns"
+                },
+                "filter": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": true
+                            },
+                            {
+                                "type": [
+                                    "string",
+                                    "number"
+                                ]
+                            }
+                        ]
+                    },
+                    "title": "filter"
+                },
+                "allow_aggregations": {
+                    "type": "boolean",
+                    "title": "allow_aggregations"
+                },
+                "limit": {
+                    "type": "integer",
+                    "title": "limit"
+                }
+            },
+            "required": [
+                "columns"
+            ]
+        },
+        "UpdatePermission": {
+            "title": "UpdatePermission",
+            "type": "object",
+            "properties": {
+                "role": {
+                    "type": "string",
+                    "title": "role"
+                },
+                "permission": {
+                    "$ref": "#/definitions/UpdatePermissionOptions",
+                    "title": "permission"
+                }
+            },
+            "required": [
+                "permission",
+                "role"
+            ]
+        },
+        "UpdatePermissionOptions": {
+            "title": "UpdatePermissionOptions",
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    },
+                    "title": "columns"
+                },
+                "filter": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": true
+                            },
+                            {
+                                "type": [
+                                    "string",
+                                    "number"
+                                ]
+                            }
+                        ]
+                    },
+                    "title": "filter"
+                },
+                "check": {
+                    "type": "object",
+                    "additionalProperties": {
+                        "anyOf": [
+                            {
+                                "type": "object",
+                                "properties": {},
+                                "additionalProperties": true
+                            },
+                            {
+                                "type": [
+                                    "string",
+                                    "number"
+                                ]
+                            }
+                        ]
+                    },
+                    "title": "check"
+                }
+            },
+            "required": [
+                "columns"
+            ]
+        },
+        "EventTrigger": {
+            "description": "EVENT TRIGGER",
+            "title": "EventTrigger",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "definition": {
+                    "$ref": "#/definitions/EventTriggerDefinition",
+                    "title": "definition"
+                },
+                "retry_conf": {
+                    "$ref": "#/definitions/RetryConf",
+                    "title": "retry_conf"
+                },
+                "webhook": {
+                    "type": "string",
+                    "title": "webhook"
+                },
+                "headers": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/Header"
+                    },
+                    "title": "headers"
+                }
+            },
+            "required": [
+                "definition",
+                "name",
+                "retry_conf",
+                "webhook"
+            ]
+        },
+        "EventTriggerDefinition": {
+            "title": "EventTriggerDefinition",
+            "type": "object",
+            "properties": {
+                "enable_manual": {
+                    "type": "boolean",
+                    "title": "enable_manual"
+                },
+                "insert": {
+                    "$ref": "#/definitions/ColumnList",
+                    "title": "insert"
+                },
+                "delete": {
+                    "$ref": "#/definitions/ColumnList",
+                    "title": "delete"
+                },
+                "update": {
+                    "$ref": "#/definitions/ColumnList",
+                    "title": "update"
+                }
+            },
+            "required": [
+                "enable_manual"
+            ]
+        },
+        "ColumnList": {
+            "title": "ColumnList",
+            "type": "object",
+            "properties": {
+                "columns": {
+                    "anyOf": [
+                        {
+                            "type": "array",
+                            "items": {
+                                "type": "string"
+                            }
+                        },
+                        {
+                            "type": "string"
+                        }
+                    ],
+                    "title": "columns"
+                }
+            },
+            "required": [
+                "columns"
+            ]
+        },
+        "Header": {
+            "title": "Header",
+            "type": "object",
+            "properties": {
+                "value": {
+                    "type": "string",
+                    "title": "value"
+                },
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                }
+            },
+            "required": [
+                "name",
+                "value"
+            ]
+        },
+        "RetryConf": {
+            "title": "RetryConf",
+            "type": "object",
+            "properties": {
+                "num_retries": {
+                    "type": "integer",
+                    "title": "num_retries"
+                },
+                "interval_sec": {
+                    "type": "integer",
+                    "title": "interval_sec"
+                },
+                "timeout_sec": {
+                    "type": "integer",
+                    "title": "timeout_sec"
+                }
+            },
+            "required": [
+                "interval_sec",
+                "num_retries",
+                "timeout_sec"
+            ]
+        },
+        "AllowList": {
+            "description": "ALLOW LIST & QUERY COLLECTIONS",
+            "title": "AllowList",
+            "type": "object",
+            "properties": {
+                "collection": {
+                    "type": "string",
+                    "title": "collection"
+                }
+            },
+            "required": [
+                "collection"
+            ]
+        },
+        "QueryCollection": {
+            "title": "QueryCollection",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "definition": {
+                    "type": "object",
+                    "properties": {
+                        "queries": {
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/Query"
+                            },
+                            "title": "queries"
+                        }
+                    },
+                    "required": [
+                        "queries"
+                    ],
+                    "title": "definition"
+                }
+            },
+            "required": [
+                "definition",
+                "name"
+            ]
+        },
+        "Query": {
+            "title": "Query",
+            "type": "object",
+            "properties": {
+                "name": {
+                    "type": "string",
+                    "title": "name"
+                },
+                "query": {
+                    "type": "string",
+                    "title": "query"
+                }
+            },
+            "required": [
+                "name",
+                "query"
+            ]
+        }
+    }
+}

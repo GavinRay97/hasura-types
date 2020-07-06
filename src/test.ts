@@ -3,8 +3,6 @@ import { default as yaml } from 'js-yaml'
 import { default as fs } from 'fs'
 import { default as path } from 'path'
 import { default as glob } from 'fast-glob'
-import { createValidator } from '@typeonly/validator'
-import { createStandaloneRtoModule, parseTypeOnly } from 'typeonly'
 
 interface TestConfig {
   typeDefinitionFile?: string
@@ -17,52 +15,41 @@ interface TestConfig {
 const pathToRoot = path.join(__dirname, '../')
 const configFilePath = path.join(pathToRoot, 'test-config.yaml')
 
-async function runTypecheckTests() {
+async function collectTestInputs() {
   const configText = await fs.promises.readFile(configFilePath, 'utf-8')
   const tests: TestConfig[] = yaml.load(configText)
 
-  let outputs = []
+  let results = []
   for (let entry of tests) {
     console.log('Running test for file', entry.typeDefinitionFile)
-
     const tsFilePath = path.join(pathToRoot, entry.typeDefinitionFile)
-    const tsFile = await fs.promises.readFile(tsFilePath, 'utf-8')
-
-    const validator = await createValidator({
-      modulePaths: ['./placeholder'],
-      rtoModuleProvider: async () =>
-        createStandaloneRtoModule({ ast: parseTypeOnly({ source: tsFile }) }),
-    })
 
     for (let { files, expectType } of entry.jsonInputTests) {
       for (let file of await glob(files, { cwd: pathToRoot })) {
         console.log('Checking input data from', file)
 
         const filePath = path.join(pathToRoot, file)
-        const filetext = await fs.promises.readFile(filePath, 'utf-8')
+        const data = await fs.promises.readFile(filePath, 'utf-8')
 
-        const testData = JSON.parse(filetext)
-        const result = validator.validate(expectType, testData, './placeholder')
-
-        const { typeDefinitionFile } = entry
-        outputs.push({ file, result, typeDefinitionFile })
+        results.push({ file, data, tsFilePath, expectType })
       }
     }
   }
 
-  return outputs
+  return results
 }
 
 async function main() {
-  for (let output of await runTypecheckTests()) {
-    const testFileInfo = `[TYPE]: ${output.typeDefinitionFile} \n[INPUT]: ${output.file}`
+  for (let entry of await collectTestInputs()) {
+    const testFileInfo = `[TYPE]: ${entry.tsFilePath} \n[INPUT]: ${entry.file}`
 
     test('Expect Pass & Get Valid Result \n' + testFileInfo, (t) => {
-      t.is(output.result.valid, true)
+      t.notThrows(() => {
+        const { Convert } = require(entry.tsFilePath)
+        Convert['to' + entry.expectType](entry.data)
+      }, 'Converion from data to generated type failed')
     })
   }
 }
 
-main()
-
-// main().catch((err) => console.log('ERR IN MAIN', err))
+main().catch((err) => console.log('ERR IN TESTS', err))

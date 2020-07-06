@@ -5,14 +5,32 @@
   "repository": "git@github.com:GavinRay97/hasura-types.git",
   "author": "Gavin <ray.gavin97@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "generate-types": "ts-node ./src/generateTypes.ts",
+    "test": "./node_modules/.bin/ava --verbose"
+  },
   "dependencies": {
+    "fast-glob": "^3.2.4",
     "js-yaml": "^3.14.0",
     "quicktype": "^15.0.248",
     "quicktype-core": "^6.0.66",
-    "quicktype-typescript-input": "^0.0.11"
+    "quicktype-typescript-input": "^0.0.11",
+    "tsd": "^0.12.1"
   },
   "devDependencies": {
+    "@typeonly/validator": "^0.5.1",
     "@types/node": "^14.0.14",
+    "ava": "^3.9.0",
+    "ts-node": "^8.10.2",
+    "typeonly": "^0.4.1",
     "typescript": "^3.9.6"
+  },
+  "ava": {
+    "extensions": [
+      "ts"
+    ],
+    "require": [
+      "ts-node/register"
+    ]
   }
 }

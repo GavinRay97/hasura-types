@@ -1,5 +1,5 @@
 import { promisify } from 'util'
-import * as _glob from 'glob'
+import _glob from 'glob'
 const glob = promisify(_glob)
 import * as yaml from 'js-yaml'
 import * as path from 'path'
@@ -13,7 +13,7 @@ import {
   RendererOptions,
   SerializedRenderResult,
 } from 'quicktype-core'
-import * as assert from 'assert'
+import assert from 'assert'
 
 /**
  * CONFIG
@@ -112,6 +112,18 @@ async function runTypeConversion(options: TypegenOptions) {
   let schema = await getSchemaForFile(file, source)
   await schemaInput.addSource({ name: typeName, schema })
 
+  // Dirty hack, if trying to convert from TS -> JSON Schema
+  // We need to stop here and return schema directly, or else it'll mess up the output
+  // by trying to convert it twice. So we fake a SerializedRenderResult manually.
+  if (lang == 'schema') {
+    const parsedSchema = JSON.stringify(JSON.parse(schema), null, 2)
+    const result: SerializedRenderResult = {
+      lines: parsedSchema.split('\n'),
+      annotations: [],
+    }
+    return result
+  }
+
   inputData.addInput(schemaInput)
   return quicktype({ inputData, rendererOptions, lang })
 }
@@ -188,13 +200,16 @@ function exec() {
     return
   }
 
-  const atLeastOne = Boolean(typescript || schema)
-  const butNotBoth = Boolean(typescript && schema) == false
-
-  assert(atLeastOne, 'Expected one of: --typescript | --jsonschema')
-  assert(butNotBoth, 'Expected ONLY one of: --typescript | --jsonschema')
-
   let lang = config.selected_input_language
+
+  // If no lang passed in config.yaml, check one was passed as CLI
+  if (!lang) {
+    const atLeastOne = Boolean(typescript || schema)
+    const butNotBoth = Boolean(typescript && schema) == false
+
+    assert(atLeastOne, 'Expected one of: --typescript | --jsonschema')
+    assert(butNotBoth, 'Expected ONLY one of: --typescript | --jsonschema')
+  }
 
   // If CLI flags present, override language
   if (typescript) lang = 'Typescript'

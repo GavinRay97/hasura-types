@@ -1,0 +1,5 @@
+---
+- typeDefinitionFile: './src/types/HasuraMetadataV2.ts'
+  jsonInputTests:
+    - files: './src/tests/**.json'
+      expectType: HasuraMetadataV2

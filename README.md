@@ -1,15 +1,27 @@
+# Table of Contents
+
+- [Table of Contents](#table-of-contents)
+
 - [Introduction](#introduction)
+
 - [How to use this (aka TL;DR)](#how-to-use-this-aka-tldr)
+
 - [SDK Usage Examples (Typescript)](#sdk-usage-examples-typescript)
+
   - [Extending the Generated Class Functionality](#extending-the-generated-class-functionality)
   - [Programmatically Interacting with Metadata](#programmatically-interacting-with-metadata)
+
 - [Generator Config File Options](#generator-config-file-options)
+
 - [Test Config File Options](#test-config-file-options)
+
 - [Programmatic Usage](#programmatic-usage)
+
 - [Metadata IDE Type-Checking Integration](#metadata-ide-type-checking-integration)
+
   - [VS Code](#vs-code)
   - [Jetbrains](#jetbrains)
-  
+
 # Introduction
 
 This repo contains a script used to generate SDK's in various languages from either Typescript or JSON Schema sources. The script is configurable and built to be consumed from something such as a Github Action or a git hook.
@@ -20,32 +32,32 @@ It is being used to generate SDK's for Hasura Metadata V2
 
 ![](typescript-typecheck-demo.gif)
 
-
 **Demo: Type-Checking & Docs inside of Metadata YAML files**
 
 ![](json-schema-typecheck-demo.gif)
-
 
 # How to use this (aka TL;DR)
 
 _**"I want to..."**_
 
 - Add support to my IDE for type-checking and documentation of metadata files
-  -  See: [Metadata IDE Type-Checking Integration](#metadata-ide-type-checking-integration)
 
-- *Use an existing typed-language SDK in my project*
+  - See: [Metadata IDE Type-Checking Integration](#metadata-ide-type-checking-integration)
+
+- _Use an existing typed-language SDK in my project_
+
   - Download the SDK from the [`/generated`](./generated) directory
   - Follow the guide in [SDK Usage Examples (Typescript)](#sdk-usage-examples-typescript)
-  
-- *Generate a new SDK for a language that isn't already present in the `/generated` directory (or customize the generator options on existing ones)*
-  - Update the config, following guide here: [Test Config File Options](#test-config-file-options)
+
+- _Generate a new SDK for a language that isn't already present in the `/generated` directory (or customize the generator options on existing ones)_
+
+  - Update the config, following guide here: [Generator Config File Options](#generator-config-file-options)
   - `yarn install` or `npm install`
   - `yarn generate-types` or `npm run generate-types`
 
-
 # SDK Usage Examples (Typescript)
 
-## Extending the Generated Class Functionality
+### Extending the Generated Class Functionality
 
 The SDK generated for Typescript contains types, but also produces a top-level class called `Convert`, which contains methods to do runtime parsing and validation of types. These are named e.g. `Convert.toCronTrigger()` and `Convert.cronTriggerToJson()`:
 
@@ -59,7 +71,7 @@ public static cronTriggerToJson(value: CronTrigger): string {
 }
 ```
 
-This class can be extended from another file to add extra functionality. Here is an example we will be using, which adds  `diff` functionality and a YAML conversion function.
+This class can be extended from another file to add extra functionality. Here is an example we will be using, which adds `diff` functionality and a YAML conversion function.
 
 ```ts
 // customMetadataConverter.ts
@@ -73,9 +85,8 @@ import {
   Action,
   CustomTypes,
   CronTrigger,
-  HasuraMetadataV2
+  HasuraMetadataV2,
 } from '../generated/HasuraMetadataV2'
-
 
 interface DiffOutput {
   structuralDiff: object
@@ -132,27 +143,35 @@ export class Convert extends _Convert {
 }
 ```
 
-## Programmatically Interacting with Metadata
+### Programmatically Interacting with Metadata
 
 Below is an example to demonstrate the common usecases you may encounter when wanting to script your interactions with metadata. It includes:
+
 - Loading `tables.yaml`, and `actions.yaml` files
 - Adding a new table
 - Creating a JSON and text diff of `tables.yaml`, and writing it to a `diffs` folder
 - Repeating the above process for `metadata.json` (could be `metadata.yaml` as well)
-  
+
 ```ts
 import { Convert } from './customMetadataConverter'
-import { TableEntry, Action, CustomTypes, HasuraMetadataV2 } from '../generated/HasuraMetadataV2'
+import {
+  TableEntry,
+  Action,
+  CustomTypes,
+  HasuraMetadataV2,
+} from '../generated/HasuraMetadataV2'
 
 const tablesMetadataFile = fs.readFileSync('./metadata/tables.yaml', 'utf8')
 const tablesMetadata: TableEntry[] = Convert.loadYAML(tablesMetadataFile)
 tablesMetadata.forEach(console.log)
 
 const actionMetadataFile = fs.readFileSync('./metadata/actions.yaml', 'utf8')
-const actionMetadata: { actions: Action[], custom_types: CustomTypes } = Convert.loadYAML(actionMetadataFile)
+const actionMetadata: {
+  actions: Action[]
+  custom_types: CustomTypes
+} = Convert.loadYAML(actionMetadataFile)
 actionMetadata.actions.forEach(console.log)
 console.log(actionMetadata.custom_types)
-
 
 const newTable: TableEntry = {
   table: { schema: 'public', name: 'user' },
@@ -167,9 +186,9 @@ const newTable: TableEntry = {
         filter: {
           id: { _eq: 'X-Hasura-User-ID' },
         },
-      }
-    }
-  ]
+      },
+    },
+  ],
 }
 
 const originalTablesMetadata = Convert.clone(tablesMetadata)
@@ -189,7 +208,6 @@ allMetadata.tables.push(newTable)
 const metadataDiff = Convert.diff(beforeMetadataChanges, allMetadata)
 Convert.writeDiff({ folder: 'diffs', file: 'metadata', diffs: metadataDiff })
 ```
-
 
 # Generator Config File Options
 
@@ -318,14 +336,13 @@ generateTypes()
 
 Ever tried (or wanted) to write Hasura Metadata YAML definitions by hand, but found yourself frequently pulled back to documentation for definitions, or fighting YAML's whitespace sensitivity? Well, no more!
 
-
-## VS Code
+### VS Code
 
 VS Code has native support for supplying JSON Schemas when editing JSON files. The [YAML extension authored by Redhat](https://github.com/redhat-developer/vscode-yaml) extends identical support to YAML files.
 
 Follow the configuration below to enable type-checking, documentation, and auto-completion of Hasura metadata YAML files in your project:
 
-*Note: In the future, this may be refactored to point to hosted schema links on Github so that manual copying of schema files is not necessary.*
+_Note: In the future, this may be refactored to point to hosted schema links on Github so that manual copying of schema files is not necessary._
 
 `.vscode/extensions.json`
 
@@ -452,7 +469,7 @@ Follow the configuration below to enable type-checking, documentation, and auto-
 }
 ```
 
-## Jetbrains
+### Jetbrains
 
 YAML Instructions:
 

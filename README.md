@@ -161,11 +161,15 @@ import {
   HasuraMetadataV2,
 } from '../generated/HasuraMetadataV2'
 
+// Read "tables.yaml" file as text from filesystem
 const tablesMetadataFile = fs.readFileSync('./metadata/tables.yaml', 'utf8')
+// Convert it to JSON object with type annotation using loadYAML utility
 const tablesMetadata: TableEntry[] = Convert.loadYAML(tablesMetadataFile)
 tablesMetadata.forEach(console.log)
 
+// Read "actions.yaml" file as text from filesystem
 const actionMetadataFile = fs.readFileSync('./metadata/actions.yaml', 'utf8')
+// Convert it to JSON object with type annotation using loadYAML utility
 const actionMetadata: {
   actions: Action[]
   custom_types: CustomTypes
@@ -173,6 +177,7 @@ const actionMetadata: {
 actionMetadata.actions.forEach(console.log)
 console.log(actionMetadata.custom_types)
 
+// Make a new table object
 const newTable: TableEntry = {
   table: { schema: 'public', name: 'user' },
   select_permissions: [
@@ -191,20 +196,32 @@ const newTable: TableEntry = {
   ],
 }
 
+// Clone the tables for comparison after changes using diff()
 const originalTablesMetadata = Convert.clone(tablesMetadata)
+// Add the new table to tables metadata
 tablesMetadata.push(newTable)
 
+// Generate a structural and text diff from the changes between original and now
 const tableDiff = Convert.diff(originalTablesMetadata, tablesMetadata)
+// Write the diffs to /diffs folder, will output "tables.json" and "tables.diff"
 Convert.writeDiff({ folder: 'diffs', file: 'tables', diffs: tableDiff })
+// Ouput the updated "tables.yaml" to filesystem
+fs.writeFileSync(
+  './tables-updated.yaml',
+  Convert.metadataToYAML(tablesMetadata)
+)
 
+// Read "metadata.json"
 const metadataFile = fs.readFileSync('./metadata.json', 'utf-8')
 // Convert.to<typeName> does runtime validation of the type
 const allMetadata: HasuraMetadataV2 = Convert.toHasuraMetadataV2(metadataFile)
 console.log(allMetadata)
 
+// Clone, add table
 const beforeMetadataChanges = Convert.clone(allMetadata)
 allMetadata.tables.push(newTable)
 
+// Diff, write diff
 const metadataDiff = Convert.diff(beforeMetadataChanges, allMetadata)
 Convert.writeDiff({ folder: 'diffs', file: 'metadata', diffs: metadataDiff })
 ```

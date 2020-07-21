@@ -12,6 +12,7 @@ import {
   JSONSchemaStore,
   RendererOptions,
   SerializedRenderResult,
+  JSONSchemaSourceData,
 } from 'quicktype-core'
 import assert from 'assert'
 
@@ -99,24 +100,20 @@ async function getSchemaForFile(file: string, source: SourceLanguage) {
     case 'JsonSchema':
       return fs.readFile(file, 'utf-8')
     case 'Typescript':
-      return schemaForTypeScriptSources([file]).schema
+      return schemaForTypeScriptSources([file])
   }
 }
 
+// TODO: Make this take more than one file at a time, for resolving type imports in files
 async function runTypeConversion(options: TypegenOptions) {
   const { source, lang, rendererOptions, typeName, file } = options
-  //@ts-ignore
-  const schemaInput = new JSONSchemaInput(new JSONSchemaStore())
-  const inputData = new InputData()
-
   let schema = await getSchemaForFile(file, source)
-  await schemaInput.addSource({ name: typeName, schema })
 
-  // Dirty hack, if trying to convert from TS -> JSON Schema
+  // Dirty hack, if trying to convert from JSON Schema -> JSON Schema
   // We need to stop here and return schema directly, or else it'll mess up the output
   // by trying to convert it twice. So we fake a SerializedRenderResult manually.
-  if (lang == 'schema') {
-    const parsedSchema = JSON.stringify(JSON.parse(schema), null, 2)
+  if (source == 'JsonSchema' && lang == 'schema') {
+    const parsedSchema = JSON.stringify(JSON.parse(source as string), null, 2)
     const result: SerializedRenderResult = {
       lines: parsedSchema.split('\n'),
       annotations: [],
@@ -124,6 +121,10 @@ async function runTypeConversion(options: TypegenOptions) {
     return result
   }
 
+  //@ts-ignore
+  const schemaInput = new JSONSchemaInput(new JSONSchemaStore())
+  const inputData = new InputData()
+  await schemaInput.addSource(schema as JSONSchemaSourceData)
   inputData.addInput(schemaInput)
   return quicktype({ inputData, rendererOptions, lang })
 }

@@ -1,3 +1,18 @@
 {
-  "typescript.tsdk": "node_modules/typescript/lib"
+  "typescript.tsdk": "node_modules/typescript/lib",
+  "json.schemas": [
+    {
+      "fileMatch": ["/*.test.json"],
+      "url": "./src/metadata-schemas/MetadataExport.schema.json"
+    }
+  ],
+  "yaml.schemas": {
+    "./src/metadata-schemas/TablesYAML.schema.json": "**/tables.yaml",
+    "./src/metadata-schemas/CronTriggerYAML.schema.json": "**/cron_triggers.yaml",
+    "./src/metadata-schemas/ActionsYAML.schema.json": "**/actions.yaml",
+    "./src/metadata-schemas/QueryCollectionsYAML.schema.json": "**/query_collections.yaml",
+    "./src/metadata-schemas/RemoteSchemasYAML.schema.json": "**/remote_schemas.yaml",
+    "./src/metadata-schemas/AllowListYAML.schema.json": "**/allow_list.yaml",
+    "./src/metadata-schemas/FunctionsYAML.schema.json": "**/functions.yaml"
+  }
 }

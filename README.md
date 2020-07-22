@@ -1,40 +1,26 @@
 # Table of Contents
 
 - [Table of Contents](#table-of-contents)
-
 - [Introduction](#introduction)
-
 - [How to use this (aka TL;DR)](#how-to-use-this-aka-tldr)
-
+- [Demos](#demos)
+    - [Typescript SDK](#typescript-sdk)
+    - [Type-Checking & Docs inside of Metadata YAML files](#type-checking--docs-inside-of-metadata-yaml-files)
 - [SDK Usage Examples (Typescript)](#sdk-usage-examples-typescript)
-
-  - [Extending the Generated Class Functionality](#extending-the-generated-class-functionality)
-  - [Programmatically Interacting with Metadata](#programmatically-interacting-with-metadata)
-
+    - [Extending the Generated Class Functionality](#extending-the-generated-class-functionality)
+    - [Programmatically Interacting with Metadata](#programmatically-interacting-with-metadata)
 - [Generator Config File Options](#generator-config-file-options)
-
 - [Test Config File Options](#test-config-file-options)
-
 - [Programmatic Usage](#programmatic-usage)
-
 - [Metadata IDE Type-Checking Integration](#metadata-ide-type-checking-integration)
-
-  - [VS Code](#vs-code)
-  - [Jetbrains](#jetbrains)
+    - [VS Code](#vs-code)
+    - [Jetbrains](#jetbrains)
 
 # Introduction
 
 This repo contains a script used to generate SDK's in various languages from either Typescript or JSON Schema sources. The script is configurable and built to be consumed from something such as a Github Action or a git hook.
 
 It is being used to generate SDK's for Hasura Metadata V2
-
-**Demo: Typescript SDK**
-
-![](typescript-typecheck-demo.gif)
-
-**Demo: Type-Checking & Docs inside of Metadata YAML files**
-
-![](json-schema-typecheck-demo.gif)
 
 # How to use this (aka TL;DR)
 
@@ -54,6 +40,16 @@ _**"I want to..."**_
   - Update the config, following guide here: [Generator Config File Options](#generator-config-file-options)
   - `yarn install` or `npm install`
   - `yarn generate-types` or `npm run generate-types`
+
+# Demos
+
+### Typescript SDK
+
+![](typescript-typecheck-demo.gif)
+
+### Type-Checking & Docs inside of Metadata YAML files
+
+![](json-schema-typecheck-demo.gif)
 
 # SDK Usage Examples (Typescript)
 

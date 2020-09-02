@@ -61,8 +61,8 @@
 //    qualifiedFunction, err := UnmarshalQualifiedFunction(bytes)
 //    bytes, err = qualifiedFunction.Marshal()
 //
-//    function, err := UnmarshalFunction(bytes)
-//    bytes, err = function.Marshal()
+//    customFunction, err := UnmarshalCustomFunction(bytes)
+//    bytes, err = customFunction.Marshal()
 //
 //    functionConfiguration, err := UnmarshalFunctionConfiguration(bytes)
 //    bytes, err = functionConfiguration.Marshal()
@@ -446,13 +446,13 @@ func (r *QualifiedFunction) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
-func UnmarshalFunction(data []byte) (Function, error) {
-	var r Function
+func UnmarshalCustomFunction(data []byte) (CustomFunction, error) {
+	var r CustomFunction
 	err := json.Unmarshal(data, &r)
 	return r, err
 }
 
-func (r *Function) Marshal() ([]byte, error) {
+func (r *CustomFunction) Marshal() ([]byte, error) {
 	return json.Marshal(r)
 }
 
@@ -992,7 +992,7 @@ type HasuraMetadataV2 struct {
 	Allowlist        []AllowList            `json:"allowlist"`             
 	CronTriggers     []CronTrigger          `json:"cron_triggers"`         
 	CustomTypes      *CustomTypes           `json:"custom_types,omitempty"`
-	Functions        []Function             `json:"functions"`             
+	Functions        []CustomFunction       `json:"functions"`             
 	QueryCollections []QueryCollectionEntry `json:"query_collections"`     
 	RemoteSchemas    []RemoteSchema         `json:"remote_schemas"`        
 	Tables           []TableEntry           `json:"tables"`                
@@ -1147,7 +1147,7 @@ type ScalarType struct {
 // A custom SQL function to add to the GraphQL schema with configuration.
 //
 // https://hasura.io/docs/1.0/graphql/manual/api-reference/schema-metadata-api/custom-functions.html#args-syntax
-type Function struct {
+type CustomFunction struct {
 	Configuration *FunctionConfiguration `json:"configuration,omitempty"`// Configuration for the SQL function
 	Function      *FunctionName          `json:"function"`               // Name of the SQL function
 }

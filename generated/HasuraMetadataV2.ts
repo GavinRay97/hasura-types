@@ -1,6 +1,6 @@
 // To parse this data:
 //
-//   import { Convert, TableName, QualifiedTable, TableConfig, TableEntry, CustomRootFields, FunctionName, QualifiedFunction, Function, FunctionConfiguration, ObjectRelationship, ObjRelUsing, ObjRelUsingManualMapping, ArrayRelationship, ArrRelUsing, ArrRelUsingFKeyOn, ArrRelUsingManualMapping, InsertPermissionEntry, InsertPermission, SelectPermissionEntry, SelectPermission, UpdatePermissionEntry, UpdatePermission, DeletePermissionEntry, DeletePermission, ComputedField, ComputedFieldDefinition, EventTrigger, EventTriggerDefinition, EventTriggerColumns, OperationSpec, HeaderFromValue, HeaderFromEnv, RetryConf, CronTrigger, RetryConfST, RemoteSchema, RemoteSchemaDef, RemoteRelationship, RemoteRelationshipDef, QueryCollectionEntry, QueryCollection, AllowList, CustomTypes, InputObjectType, InputObjectField, ObjectType, ObjectField, CustomTypeObjectRelationship, ScalarType, EnumType, EnumValue, Action, ActionDefinition, InputArgument, HasuraMetadataV2 } from "./file";
+//   import { Convert, TableName, QualifiedTable, TableConfig, TableEntry, CustomRootFields, FunctionName, QualifiedFunction, CustomFunction, FunctionConfiguration, ObjectRelationship, ObjRelUsing, ObjRelUsingManualMapping, ArrayRelationship, ArrRelUsing, ArrRelUsingFKeyOn, ArrRelUsingManualMapping, InsertPermissionEntry, InsertPermission, SelectPermissionEntry, SelectPermission, UpdatePermissionEntry, UpdatePermission, DeletePermissionEntry, DeletePermission, ComputedField, ComputedFieldDefinition, EventTrigger, EventTriggerDefinition, EventTriggerColumns, OperationSpec, HeaderFromValue, HeaderFromEnv, RetryConf, CronTrigger, RetryConfST, RemoteSchema, RemoteSchemaDef, RemoteRelationship, RemoteRelationshipDef, QueryCollectionEntry, QueryCollection, AllowList, CustomTypes, InputObjectType, InputObjectField, ObjectType, ObjectField, CustomTypeObjectRelationship, ScalarType, EnumType, EnumValue, Action, ActionDefinition, InputArgument, HasuraMetadataV2 } from "./file";
 //
 //   const pGColumn = Convert.toPGColumn(json);
 //   const computedFieldName = Convert.toComputedFieldName(json);
@@ -22,7 +22,7 @@
 //   const customColumnNames = Convert.toCustomColumnNames(json);
 //   const functionName = Convert.toFunctionName(json);
 //   const qualifiedFunction = Convert.toQualifiedFunction(json);
-//   const function = Convert.toFunction(json);
+//   const customFunction = Convert.toCustomFunction(json);
 //   const functionConfiguration = Convert.toFunctionConfiguration(json);
 //   const objectRelationship = Convert.toObjectRelationship(json);
 //   const objRelUsing = Convert.toObjRelUsing(json);
@@ -136,7 +136,7 @@ export interface HasuraMetadataV2 {
     allowlist?:         AllowList[];
     cron_triggers?:     CronTrigger[];
     custom_types?:      CustomTypes;
-    functions?:         Function[];
+    functions?:         CustomFunction[];
     query_collections?: QueryCollectionEntry[];
     remote_schemas?:    RemoteSchema[];
     tables:             TableEntry[];
@@ -473,7 +473,7 @@ export interface ScalarType {
  *
  * https://hasura.io/docs/1.0/graphql/manual/api-reference/schema-metadata-api/custom-functions.html#args-syntax
  */
-export interface Function {
+export interface CustomFunction {
     /**
      * Configuration for the SQL function
      */
@@ -1301,12 +1301,12 @@ export class Convert {
         return JSON.stringify(uncast(value, r("QualifiedFunction")), null, 2);
     }
 
-    public static toFunction(json: string): Function {
-        return cast(JSON.parse(json), r("Function"));
+    public static toCustomFunction(json: string): CustomFunction {
+        return cast(JSON.parse(json), r("CustomFunction"));
     }
 
-    public static functionToJson(value: Function): string {
-        return JSON.stringify(uncast(value, r("Function")), null, 2);
+    public static customFunctionToJson(value: CustomFunction): string {
+        return JSON.stringify(uncast(value, r("CustomFunction")), null, 2);
     }
 
     public static toFunctionConfiguration(json: string): FunctionConfiguration {
@@ -1858,7 +1858,7 @@ const typeMap: any = {
         { json: "allowlist", js: "allowlist", typ: u(undefined, a(r("AllowList"))) },
         { json: "cron_triggers", js: "cron_triggers", typ: u(undefined, a(r("CronTrigger"))) },
         { json: "custom_types", js: "custom_types", typ: u(undefined, r("CustomTypes")) },
-        { json: "functions", js: "functions", typ: u(undefined, a(r("Function"))) },
+        { json: "functions", js: "functions", typ: u(undefined, a(r("CustomFunction"))) },
         { json: "query_collections", js: "query_collections", typ: u(undefined, a(r("QueryCollectionEntry"))) },
         { json: "remote_schemas", js: "remote_schemas", typ: u(undefined, a(r("RemoteSchema"))) },
         { json: "tables", js: "tables", typ: a(r("TableEntry")) },
@@ -1956,7 +1956,7 @@ const typeMap: any = {
         { json: "description", js: "description", typ: u(undefined, "") },
         { json: "name", js: "name", typ: "" },
     ], "any"),
-    "Function": o([
+    "CustomFunction": o([
         { json: "configuration", js: "configuration", typ: u(undefined, r("FunctionConfiguration")) },
         { json: "function", js: "function", typ: u(r("QualifiedFunction"), "") },
     ], "any"),
